@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import Error from "./Error";
 
-const Formulario = () => {
+const Formulario = ({ pacientes, setPacientes }) => {
   const [nombre, setNombre] = useState("");
   const [propietario, setPropietario] = useState("");
   const [email, setEmail] = useState("");
@@ -8,17 +9,38 @@ const Formulario = () => {
   const [sintomas, setSintomas] = useState("");
   const [error, setError] = useState(false);
 
+  const generarId = () => {
+    const random = Math.random().toString(36).substring(2);
+    const fecha = Date.now().toString(36);
+
+    return random + fecha;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     // Validación del Formulario
     if ([nombre, propietario, email, fecha, sintomas].includes("")) {
       setError(true);
-      console.log("Hay al menos un campo vacío");
-    } else {
-      setError(false);
-      console.log("Todos llenos");
+      return;
     }
+    setError(false);
+    const objetoNuevo = {
+      id: generarId(),
+      nombre,
+      propietario,
+      email,
+      fecha,
+      sintomas,
+    };
+    setPacientes([...pacientes, objetoNuevo]);
+
+    // Reinicio formulario
+    setNombre("");
+    setPropietario("");
+    setEmail("");
+    setFecha("");
+    setSintomas("");
   };
 
   return (
@@ -35,9 +57,9 @@ const Formulario = () => {
         className="bg-white shadow-md rounded-lg py-10 px-5"
       >
         {error && (
-          <div className="bg-red-800 text-white text-center p-3 uppercase font-bold mb-3 rounded-md">
+          <Error>
             <p>Todos los campos son obligatorios</p>
-          </div>
+          </Error>
         )}
         <div className="mb-5">
           <label
@@ -115,7 +137,7 @@ const Formulario = () => {
           </label>
           <textarea
             id="sintomas"
-            placeholder="Dexcribe los síntomas"
+            placeholder="Describe los síntomas"
             className="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
             value={sintomas}
             onChange={(e) => setSintomas(e.target.value)}
